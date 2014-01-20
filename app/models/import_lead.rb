@@ -47,7 +47,6 @@ class ImportLead
         account = Account.find_or_initialize_by_name(lead.company).tap do |account|
           account.assignee = @assigned if @assigned.present?
           account.access = Setting.default_access
-          account.category = "Customer"
         end.save!
 
         @account, @opportunity, @contact = lead.promote(:account => account.id)
