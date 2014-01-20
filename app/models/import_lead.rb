@@ -42,22 +42,33 @@ class ImportLead
       if @promote_leads
 
         # Rails.logger.info "XXXXXXXX PROMOTE LEAD!"
-        @account, @opportunity, @contact = lead.promote(:account => lead.company)
+        # @account, @opportunity, @contact = lead.promote(:account => lead.company)
 
-        if @account.errors.empty? && @contact.errors.empty?
+        account = Account.find_or_initialize_by_name(lead.company).tap do |account|
+          account.assignee = @assigned if @assigned.present?
+          account.access = Setting.default_access
+          account.category = "Customer"
+        end.save!
 
-          contact = Contact.find(@contact)
-          contact.tag_list.add(tag)
-          contact.add_comment_by_user(comments, @assigned)
-          contact.save!
+        @account, @opportunity, @contact = lead.promote(:account => account.id)
 
-          Rails.logger.info "XXXXXXXX CONTACT CREATED!"
+        Rails.logger.info "XXXXXXXX ERROR! Account:#{@account.errors} Contact: #{@contact.errors}"
 
-          lead.convert
-          lead.save!
-        else
-           Rails.logger.info "XXXXXXXX ERROR! Account:#{@account.errors} Contact: #{@contact.errors}"
-        end
+        # Contact.find_or_initialize_by_email(lead.email).tap do |contact|
+        #   contact.access = Setting.default_access
+        #   contact.assignee = @assigned if @assigned.present?
+        # end.save!
+
+        contact = Contact.find(@contact)
+        contact.tag_list.add(tag)
+        contact.add_comment_by_user(comments, @assigned)
+        contact.save!
+
+        Rails.logger.info "XXXXXXXX CONTACT CREATED!"
+
+        lead.convert
+        lead.save!
+
       else
         lead.tag_list.add(tag)
         lead.add_comment_by_user(comments, @assigned)
