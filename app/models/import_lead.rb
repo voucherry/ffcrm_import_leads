@@ -13,65 +13,40 @@ class ImportLead
   end
 
   # Sample Format
-  # "Source","First Name","Last Name","Gender","Company Name","Phone Number","Address","City",
-  # "State","ZIP code","ZIP+4","database name","File Date","id","Production Date"
+  # "campaign_id","source","tag","created_at","title","first_name","last_name","email","phone","company","status","background_info","comments","street1","street2","city","state","zipcode","country"
   def import
     CSV.foreach(@file.path, :converters => :all, :return_headers => false, :headers => :first_row) do |row|
-      campaign_id, source, created_at, first_name, last_name, email, title, company, phone, status, comments, street, city, state, zip, country = *row.to_hash.values
+      campaign_id, source, tag, created_at, title, first_name, last_name,
+      email, phone, company, status, background_info, comments,
+      street1, street2, city, state, zip, country = *row.to_hash.values
 
-      lead = Lead.new(:campaign_id => campaign_id.to_i, :source => source, :first_name => first_name,
-        :last_name => last_name, :company => company, :title => title, :phone => phone,
-        :status => status, :user_id => @assigned.id, :created_at => :created_at)
+      lead = Lead.new(:campaign_id => campaign_id.to_i, :source => source,
+        :title => title, :first_name => first_name, :last_name => last_name,
+        :email => email, :phone => phone,  :company => company, :status => status,
+        :background_info => background_info, :user_id => @assigned.id, :created_at => :created_at)
 
-      lead.first_name = "FILL ME" if lead.first_name.blank?
-      lead.last_name = "FILL ME" if lead.last_name.blank?
-      lead.access = "Private"
-      lead.business_address = Address.new(:street1 => street, :city => city, :state => state, :zipcode => zip, :country => country, :address_type => "Business")
+      lead.first_name = "INCOMPLETE" if lead.first_name.blank?
+      lead.last_name = "INCOMPLETE" if lead.last_name.blank?
+
+      # lead.access? = "Private | Public"
+      lead.access = Setting.default_access
+
+      lead.business_address = Address.new(:street1 => street1, :street2 => street2, :city => city, :state => state, :zipcode => zip, :country => country, :address_type => "Business")
 
       lead.assignee = @assigned if @assigned.present?
       lead.save!
 
-      lead.add_comment_by_user(comments, @assigned)
+      # if promote_lead?
+      #   @account, @opportunity, @contact = lead.promote(:account => lead.company)
+      #   contact = Contact.find(@contact)
+      #   contact.tag_list.add(tag)
+      #   contact.add_comment_by_user(comments, @assigned)
+      #   contact.save!
+      # else
+        lead.tag_list.add(tag)
+        lead.add_comment_by_user(comments, @assigned)
+        lead.save!
+      # end
     end
   end
 end
-
-## orignal
-# require 'csv'
-
-# class ImportLead
-#   def initialize(file)
-#     @file = file
-#   end
-
-#   def import_assigned_to(assigned)
-#     @assigned = assigned
-
-#     import
-#   end
-
-#   # Sample Format
-#   # "Source","First Name","Last Name","Gender","Company Name","Phone Number","Address","City",
-#   # "State","ZIP code","ZIP+4","database name","File Date","id","Production Date"
-#   def import
-#     CSV.foreach(@file.path, :converters => :all, :return_headers => false, :headers => :first_row) do |row|
-#       source, first_name, last_name, _, company, phone, *address = *row.to_hash.values
-
-#       street, city, state, zip, _ = *address
-#       address = Address.new(:street1 => street, :city => city, :state => state, :zipcode => zip)
-
-#       lead = Lead.new(:source => source, :first_name => first_name, :last_name => last_name,
-#                       :company => company, :phone => phone)
-
-#       lead.first_name = "FILL ME" if lead.first_name.blank?
-#       lead.last_name = "FILL ME" if lead.last_name.blank?
-#       lead.access = "Private"
-#       lead.addresses << address
-
-#       lead.assignee = @assigned if @assigned.present?
-
-#       lead.save!
-#     end
-#   end
-# end
-
