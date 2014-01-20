@@ -23,7 +23,7 @@ class ImportLead
       lead = Lead.new(:campaign_id => campaign_id.to_i, :source => source,
         :title => title, :first_name => first_name, :last_name => last_name,
         :email => email, :phone => phone,  :company => company, :status => status,
-        :background_info => background_info, :user_id => @assigned.id, :created_at => created_at)
+        :background_info => background_info, :user_id => @assigned.id, :created_at => created_at.to_time)
 
       lead.first_name = "INCOMPLETE" if lead.first_name.blank?
       lead.last_name = "INCOMPLETE" if lead.last_name.blank?
