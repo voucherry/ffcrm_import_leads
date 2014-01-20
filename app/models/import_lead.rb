@@ -40,12 +40,24 @@ class ImportLead
       lead.save!
 
       if @promote_leads
-        Rails.logger.info "XXXXXXXX PROMOTE LEAD!"
-      #   @account, @opportunity, @contact = lead.promote(:account => lead.company)
-      #   contact = Contact.find(@contact)
-      #   contact.tag_list.add(tag)
-      #   contact.add_comment_by_user(comments, @assigned)
-      #   contact.save!
+
+        # Rails.logger.info "XXXXXXXX PROMOTE LEAD!"
+        @account, @opportunity, @contact = lead.promote(:account => lead.company)
+
+        if @account.errors.empty? && @contact.errors.empty?
+
+          contact = Contact.find(@contact)
+          contact.tag_list.add(tag)
+          contact.add_comment_by_user(comments, @assigned)
+          contact.save!
+
+          Rails.logger.info "XXXXXXXX CONTACT CREATED!"
+
+          lead.convert
+          lead.save!
+        else
+           Rails.logger.info "XXXXXXXX ERROR! Account:#{@account.errors} Contact: #{@contact.errors}"
+        end
       else
         lead.tag_list.add(tag)
         lead.add_comment_by_user(comments, @assigned)
