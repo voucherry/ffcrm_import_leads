@@ -16,10 +16,10 @@
           .label #{t :convert_to_contacts}:
           = f.check_box :convert_to_contacts
 
-      %tr
-        %td
-          .label #{t :tag_with}:
-          = f.text_field :tag_with, :input_html =>{:size=>20}
+      -# %tr
+      -#   %td
+      -#     .label #{t :tag_with}:
+      -#     = f.text_field :tag_with, :input_html =>{:size=>20}
 
     .buttonbar
       = f.submit t(:import_leads)
