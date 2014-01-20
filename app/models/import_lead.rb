@@ -50,7 +50,7 @@ class ImportLead
         end
         account.save!
 
-        @account, @opportunity, @contact = lead.promote(:account => account.id)
+        @account, @opportunity, @contact = lead.promote(:account => account["id"])
 
         Rails.logger.info "XXXXXXXX ERROR! Account:#{@account.errors} Contact: #{@contact.errors}"
 
