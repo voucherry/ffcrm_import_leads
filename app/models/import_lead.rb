@@ -12,17 +12,23 @@ class ImportLead
     import
   end
 
+  def promote_leads(convert_to_contacts)
+    @promote_leads = convert_to_contacts
+  end
+
   # Sample Format
-  # "campaign_id","source","tag","created_at","title","first_name","last_name","email","phone","company","status","background_info","comments","street1","street2","city","state","zipcode","country"
+  # "campaign_id","source","tag","created_at","first_name","last_name","email","phone","company","title","status","background_info","comments","street1","street2","city","state","zipcode","country"
   def import
     CSV.foreach(@file.path, :converters => :all, :return_headers => false, :headers => :first_row) do |row|
-      campaign_id, source, tag, created_at, title, first_name, last_name,
-      email, phone, company, status, background_info, comments,
+      campaign_id, source, tag, created_at, first_name, last_name,
+      email, phone, company, title, status, background_info, comments,
       street1, street2, city, state, zip, country = *row.to_hash.values
 
+      #TODO: check for duplicates based on email (include contacts)
+
       lead = Lead.new(:campaign_id => campaign_id.to_i, :source => source,
-        :title => title, :first_name => first_name, :last_name => last_name,
-        :email => email, :phone => phone,  :company => company, :status => status,
+        :first_name => first_name, :last_name => last_name, :email => email, :phone => phone,
+        :company => company, :title => title, :status => status,
         :background_info => background_info, :user_id => @assigned.id, :created_at => created_at.to_time)
 
       lead.first_name = "INCOMPLETE" if lead.first_name.blank?
@@ -36,17 +42,18 @@ class ImportLead
       lead.assignee = @assigned if @assigned.present?
       lead.save!
 
-      # if promote_lead?
+      if @promote_leads
+        Rails.logger.info "XXXXXXXX PROMOTE LEAD!"
       #   @account, @opportunity, @contact = lead.promote(:account => lead.company)
       #   contact = Contact.find(@contact)
       #   contact.tag_list.add(tag)
       #   contact.add_comment_by_user(comments, @assigned)
       #   contact.save!
-      # else
+      else
         lead.tag_list.add(tag)
         lead.add_comment_by_user(comments, @assigned)
         lead.save!
-      # end
+      end
     end
   end
 end
