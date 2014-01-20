@@ -17,7 +17,7 @@ class Admin::ImportLeadsController < Admin::ApplicationController
     #TODO:
     tag_with =  params[:import][:tag_with]
 
-    ImportLead.new(file).promote_leads(convert_to_contacts).import_assigned_to(assigned)
+    ImportLead.new(file).import_leads(assigned, convert_to_contacts)
 
     redirect_to new_admin_import_lead_path, :notice => "Leads successfully imported"
   end

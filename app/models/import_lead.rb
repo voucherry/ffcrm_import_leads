@@ -6,14 +6,11 @@ class ImportLead
     @file = file
   end
 
-  def import_assigned_to(assigned)
+  def import_leads(assigned, convert_to_contacts)
     @assigned = assigned
+    @promote_leads = convert_to_contacts
 
     import
-  end
-
-  def promote_leads(convert_to_contacts)
-    @promote_leads = convert_to_contacts
   end
 
   # Sample Format
