@@ -18,3 +18,17 @@ gem "jquery-rails"
 # To use debugger
 # gem 'debugger'
 gem 'fat_free_crm', :git => 'git://github.com/fatfreecrm/fat_free_crm.git'
+
+group :development do
+  # don't load these gems in travis
+  unless ENV["CI"]
+    #added
+    gem 'better_errors'
+    gem 'binding_of_caller', :platforms=>[:mri_19, :rbx]
+    gem 'meta_request'
+  end
+end
+
+
+
+

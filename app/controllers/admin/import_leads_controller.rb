@@ -12,12 +12,12 @@ class Admin::ImportLeadsController < Admin::ApplicationController
   def create
     assigned = User.find(params[:import][:assigned_to])
     file = params[:import][:csv_file]
-    convert_to_contacts =  params[:import][:convert_to_contacts]
+    make_contact =  params[:import][:make_contact]
 
     #TODO:
     tag_with =  params[:import][:tag_with]
 
-    ImportLead.new(file).import_leads(assigned, convert_to_contacts)
+    ImportLead.new(file).import_leads(assigned, make_contact)
 
     redirect_to new_admin_import_lead_path, :notice => "Leads successfully imported"
   end

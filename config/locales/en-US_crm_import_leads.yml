@@ -1,5 +1,5 @@
 en-US:
   import_leads: Import Leads
   csv_file: CSV File
-  convert_to_contacts: Convert Leads to Contacts/Accounts
+  make_contact: Create as Contacts/Accounts
   tag_with: Tag with
