@@ -134,7 +134,7 @@ class ImportLead
                   lead.title = title,
                   lead.status = status,
                   lead.background_info = process_bg_info(lead.background_info, background_info),
-                  lead.created_at = created_at.to_time
+                  lead.created_at = created_at.to_time rescue nil
                 end
         lead.save!
 
