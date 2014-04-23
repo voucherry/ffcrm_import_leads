@@ -47,7 +47,7 @@ class ImportLead
                   contact.title = title,
                   # contact.status = status,
                   contact.background_info = process_bg_info(contact.background_info, background_info),
-                  contact.created_at = created_at.to_time
+                  contact.created_at = created_at.to_time rescue nil
                 end
         contact.save!
 
